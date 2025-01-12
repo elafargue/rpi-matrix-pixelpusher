@@ -65,12 +65,37 @@ public:
     }
   }
 
+  /**
+   * Manage direct commands, have to start w/ a magic 16 byte
+   * sequence (see server code)
+   */
+  virtual void HandlePusherCommand(const char *buf, size_t size) {
+    printf("Handle Pusher Commmand\n");
+  	uint8_t cmd = buf[0];
+
+    switch (cmd) {
+      case 0x01: // Brightness
+        if (size > 1) {
+          uint8_t br = buf[1];
+          if (br <= 100) {
+            matrix_->SetBrightness(br);
+          } else {
+            printf("Error, brightness too high: %i", br);
+          } 
+        }
+      break;
+      default:
+        printf("Unknown command\n");
+    }  
+  }
+
 private:
   RGBMatrix *const matrix_;
   FrameCanvas *off_screen_;
   FrameCanvas *on_screen_;
   bool full_update_requested_;
   Canvas *draw_canvas_;
+
 };
 
 static int usage(const char *progname) {
